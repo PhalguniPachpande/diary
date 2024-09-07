@@ -1,0 +1,159 @@
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+import os
+from hashlib import sha256
+from datetime import datetime
+
+# --- Directory Setup ---
+if not os.path.exists("diary_entries"):
+    os.makedirs("diary_entries")
+
+users_db = "users.txt"
+
+# --- User Authentication Functions ---
+
+def hash_password(password):
+    """Hashes a password for secure storage."""
+    return sha256(password.encode()).hexdigest()
+
+def register_user():
+    """Registers a new user."""
+    username = entry_username.get()
+    password = entry_password.get()
+
+    if username and password:
+        hashed_pw = hash_password(password)
+        if os.path.exists(users_db):
+            with open(users_db, 'r') as file:
+                users = [line.split(",")[0] for line in file.readlines()]
+                if username in users:
+                    messagebox.showerror("Error", "Username already exists!")
+                    return
+        with open(users_db, 'a') as file:
+            file.write(f"{username},{hashed_pw}\n")
+        messagebox.showinfo("Success", "User registered successfully!")
+        show_login_screen()
+    else:
+        messagebox.showwarning("Error", "Please fill in both fields!")
+
+def login_user():
+    """Logs in an existing user."""
+    username = entry_username.get()
+    password = entry_password.get()
+    hashed_pw = hash_password(password)
+
+    if os.path.exists(users_db):
+        with open(users_db, 'r') as file:
+            for line in file:
+                saved_username, saved_hashed_pw = line.strip().split(",")
+                if saved_username == username and saved_hashed_pw == hashed_pw:
+                    messagebox.showinfo("Success", "Login successful!")
+                    show_diary_mood_tracker_screen(username)
+                    return
+    messagebox.showerror("Error", "Invalid username or password!")
+
+# --- Diary and Mood Tracking Functions ---
+
+def save_diary_and_mood(username):
+    """Saves the user's diary entry and mood."""
+    entry = text_area.get("1.0", tk.END).strip()
+    mood = mood_scale.get()
+
+    if entry:
+        diary_file = f"diary_entries/{username}_diary.txt"
+        with open(diary_file, "a") as file:
+            file.write(f"{datetime.now()} - Mood: {mood}/10\n{entry}\n\n")
+        text_area.delete("1.0", tk.END)
+        messagebox.showinfo("Success", "Diary entry and mood saved!")
+        show_mood_summary(username)
+    else:
+        messagebox.showwarning("Warning", "Diary entry cannot be empty!")
+
+def show_mood_summary(username):
+    """Displays the mood summary for the logged-in user."""
+    clear_screen()
+    tk.Label(root, text=f"{username}'s Mood Summary", font=("Arial", 16)).pack(pady=20)
+    
+    diary_file = f"diary_entries/{username}_diary.txt"
+    try:
+        with open(diary_file, "r") as file:
+            summary = file.read()
+    except FileNotFoundError:
+        summary = "No entries found."
+
+    summary_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=50, height=10)
+    summary_text.insert(tk.END, summary)
+    summary_text.config(state=tk.DISABLED)  # Read-only mode
+    summary_text.pack(pady=20)
+
+    tk.Button(root, text="Back to Diary", command=lambda: show_diary_mood_tracker_screen(username)).pack(pady=10)
+
+# --- UI Navigation ---
+
+def show_register_screen():
+    """Displays the registration screen."""
+    clear_screen()
+    tk.Label(root, text="Register", font=("Arial", 16)).pack(pady=20)
+    tk.Label(root, text="Username").pack()
+    
+    global entry_username, entry_password
+    entry_username = tk.Entry(root)
+    entry_username.pack()
+    
+    tk.Label(root, text="Password").pack()
+    entry_password = tk.Entry(root, show="*")
+    entry_password.pack()
+    
+    tk.Button(root, text="Register", command=register_user).pack(pady=20)
+    tk.Button(root, text="Go to Login", command=show_login_screen).pack()
+
+def show_login_screen():
+    """Displays the login screen."""
+    clear_screen()
+    tk.Label(root, text="Login", font=("Arial", 16)).pack(pady=20)
+    tk.Label(root, text="Username").pack()
+    
+    global entry_username, entry_password
+    entry_username = tk.Entry(root)
+    entry_username.pack()
+    
+    tk.Label(root, text="Password").pack()
+    entry_password = tk.Entry(root, show="*")
+    entry_password.pack()
+    
+    tk.Button(root, text="Login", command=login_user).pack(pady=20)
+    tk.Button(root, text="Go to Register", command=show_register_screen).pack()
+
+def show_diary_mood_tracker_screen(username):
+    """Displays the diary and mood tracker screen."""
+    clear_screen()
+    tk.Label(root, text=f"Welcome, {username}", font=("Arial", 16)).pack(pady=20)
+
+    tk.Label(root, text="How are you feeling today? (1 - Bad, 10 - Great)").pack(pady=10)
+    
+    global mood_scale
+    mood_scale = tk.Scale(root, from_=1, to=10, orient=tk.HORIZONTAL)
+    mood_scale.pack(pady=10)
+
+    global text_area
+    text_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=50, height=10, font=("Arial", 12))
+    text_area.pack(pady=20)
+
+    tk.Button(root, text="Save Entry & Mood", command=lambda: save_diary_and_mood(username)).pack(pady=10)
+    tk.Button(root, text="Show Mood Summary", command=lambda: show_mood_summary(username)).pack(pady=10)
+
+def clear_screen():
+    """Clears the current screen (removes all widgets)."""
+    for widget in root.winfo_children():
+        widget.destroy()
+
+# --- Main GUI Setup ---
+
+root = tk.Tk()
+root.title("Digital Diary & Wellbeing")
+root.geometry("400x500")
+
+# Start the app by showing the login screen
+show_login_screen()
+
+root.mainloop()
