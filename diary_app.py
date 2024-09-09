@@ -41,14 +41,14 @@ class DigitalDiaryApp:
         self.main_screen()
 
     def main_screen(self):
-        tk.Label(self.root, text="Digital Diary & Wellbeing", font=("Arial", 16)).pack(pady=20)
-        tk.Button(self.root, text="Register", command=self.register_screen).pack(pady=10)
-        tk.Button(self.root, text="Login", command=self.login_screen).pack(pady=10)
+        tk.Label(self.root, text="Digital Diary & Wellbeing", font=("Arial", 21,"bold")).pack(pady=20)
+        tk.Button(self.root, text="Register",bg="green",fg="white",bd=7, command=self.register_screen).pack(pady=10)
+        tk.Button(self.root, text="Login",bg="green",fg="white",bd=7, command=self.login_screen).pack(pady=10)
 
     def register_screen(self):
         self.clear_screen()
         
-        tk.Label(self.root, text="Register", font=("Arial", 16)).pack(pady=20)
+        tk.Label(self.root, text="Register", font=("Arial", 18)).pack(pady=20)
         
         tk.Label(self.root, text="Username").pack()
         tk.Entry(self.root, textvariable=self.username_var).pack()
@@ -56,13 +56,13 @@ class DigitalDiaryApp:
         tk.Label(self.root, text="Password").pack()
         tk.Entry(self.root, textvariable=self.password_var, show='*').pack()
         
-        tk.Button(self.root, text="Register", command=self.register).pack(pady=10)
-        tk.Button(self.root, text="Back", command=self.main_screen).pack(pady=10)
+        tk.Button(self.root, text="Register",bg="green",fg="white",bd=7, command=self.register).pack(pady=10)
+        tk.Button(self.root, text="Back",bg="green",fg="white",bd=7, command=self.main_screen).pack(pady=10)
 
     def login_screen(self):
         self.clear_screen()
         
-        tk.Label(self.root, text="Login", font=("Arial", 16)).pack(pady=20)
+        tk.Label(self.root, text="Login", font=("Arial", 18)).pack(pady=20)
         
         tk.Label(self.root, text="Username").pack()
         tk.Entry(self.root, textvariable=self.username_var).pack()
@@ -70,8 +70,8 @@ class DigitalDiaryApp:
         tk.Label(self.root, text="Password").pack()
         tk.Entry(self.root, textvariable=self.password_var, show='*').pack()
         
-        tk.Button(self.root, text="Login", command=self.login).pack(pady=10)
-        tk.Button(self.root, text="Back", command=self.main_screen).pack(pady=10)
+        tk.Button(self.root, text="Login",bg="green",fg="white",bd=7, command=self.login).pack(pady=10)
+        tk.Button(self.root, text="Back",bg="green",fg="white",bd=7, command=self.main_screen).pack(pady=10)
 
 
 
@@ -115,7 +115,7 @@ class DigitalDiaryApp:
     def wellbeing_dashboard(self):
         self.clear_screen()
         
-        tk.Label(self.root, text="Wellbeing Dashboard", font=("Arial", 16)).pack(pady=20)
+        tk.Label(self.root, text="Wellbeing Dashboard", font=("Arial", 18)).pack(pady=20)
         
         self.mood_var = tk.StringVar()
         self.screen_time_var = tk.DoubleVar()
@@ -134,9 +134,9 @@ class DigitalDiaryApp:
         tk.Label(self.root, text="Average Sleep (hours)").pack()
         tk.Entry(self.root, textvariable=self.sleep_hours_var).pack()
         
-        tk.Button(self.root, text="Submit", command=self.save_diary_entry).pack(pady=10)
-        tk.Button(self.root, text="View Stats", command=self.view_stats).pack(pady=10)
-        tk.Button(self.root, text="Logout", command=self.logout).pack(pady=10)
+        tk.Button(self.root, text="Submit",bg="green",fg="white",bd=7, command=self.save_diary_entry).pack(pady=10)
+        tk.Button(self.root, text="View Stats",bg="green",fg="white",bd=7, command=self.view_stats).pack(pady=10)
+        tk.Button(self.root, text="Logout",bg="red",fg="white",bd=7, command=self.logout).pack(pady=10)
 
     def save_diary_entry(self):
         mood = self.mood_var.get()
@@ -155,7 +155,7 @@ class DigitalDiaryApp:
 
     def view_stats(self):
         self.clear_screen()
-        tk.Label(self.root, text="Wellbeing Stats", font=("Arial", 16)).pack(pady=20)
+        tk.Label(self.root, text="Wellbeing Stats", font=("Arial", 18)).pack(pady=20)
         
         # Fetch the latest diary entry for the user (for the pie chart)
         c.execute("SELECT screen_time, workout_time, sleep_hours FROM diary WHERE user_id=? ORDER BY date DESC LIMIT 1", (self.registered_user[0],))
@@ -211,7 +211,7 @@ class DigitalDiaryApp:
         canvas.draw()
         canvas.get_tk_widget().pack(pady=20)
         
-        tk.Button(self.root, text="Back", command=self.wellbeing_dashboard).pack(pady=10)
+        tk.Button(self.root, text="Back",bg="green",fg="white",bd=7, command=self.wellbeing_dashboard).pack(pady=10)
 
     def logout(self):
         self.registered_user = None
